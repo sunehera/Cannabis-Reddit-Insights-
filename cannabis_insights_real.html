@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What Patients Say — Cannabis & Cannabinoid Insights</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono&display=swap');
+
+  :root {
+    --ink: #1C1C1C;
+    --paper: #F7F5F0;
+    --mid: #6B6560;
+    --line: #E0DDD8;
+    --thc: #2D6A4F;
+    --cbd: #1D4E89;
+    --cbg: #7B4F9E;
+    --cbn: #B5451B;
+    --delta8: #8B6914;
+    --full: #2A6B6B;
+    --positive: #2D6A4F;
+    --mixed: #8B6914;
+    --negative: #B5451B;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  header {
+    border-bottom: 1px solid var(--line);
+    padding: 2rem 2rem 1.5rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--mid);
+    margin-bottom: 0.75rem;
+  }
+
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 1rem;
+  }
+
+  h1 em { font-style: italic; color: var(--mid); }
+
+  .lead {
+    font-size: 1.05rem;
+    color: var(--mid);
+    max-width: 620px;
+    margin-bottom: 1rem;
+  }
+
+  .meta {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--mid);
+    letter-spacing: 0.05em;
+  }
+
+  main { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+
+  .filter-section { margin-bottom: 2.5rem; }
+
+  .filter-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--mid);
+    display: block;
+    margin-bottom: 0.75rem;
+  }
+
+  .filter-row { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .filter-btn {
+    padding: 6px 14px;
+    border-radius: 2px;
+    border: 1px solid var(--line);
+    background: white;
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .filter-btn:hover { border-color: var(--ink); }
+  .filter-btn.active { background: var(--ink); color: white; border-color: var(--ink); }
+  .filter-btn.thc.active { background: var(--thc); border-color: var(--thc); }
+  .filter-btn.cbd.active { background: var(--cbd); border-color: var(--cbd); }
+  .filter-btn.cbg.active { background: var(--cbg); border-color: var(--cbg); }
+  .filter-btn.cbn.active { background: var(--cbn); border-color: var(--cbn); }
+  .filter-btn.full.active { background: var(--full); border-color: var(--full); }
+
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    border-top: 1px solid var(--line);
+    padding-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    margin-top: 2.5rem;
+  }
+
+  h2 { font-family: 'DM Serif Display', serif; font-size: 1.6rem; letter-spacing: -0.01em; }
+
+  .count-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--mid);
+    letter-spacing: 0.05em;
+  }
+
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+  }
+
+  .symptom-card {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    padding: 1.25rem;
+    transition: border-color 0.15s;
+  }
+
+  .symptom-card:hover { border-color: var(--ink); }
+
+  .symptom-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .cannabinoid-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 1rem;
+  }
+
+  .bar-row { display: flex; align-items: center; gap: 8px; }
+
+  .bar-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    width: 80px;
+    color: var(--ink);
+    flex-shrink: 0;
+  }
+
+  .bar-track {
+    flex: 1;
+    height: 6px;
+    background: var(--line);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+
+  .bar-count {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--mid);
+    width: 28px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .top-combo {
+    font-size: 12px;
+    color: var(--mid);
+    border-top: 1px solid var(--line);
+    padding-top: 0.75rem;
+    margin-top: 0.25rem;
+  }
+
+  .top-combo strong { color: var(--ink); font-weight: 500; }
+
+  .voices-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+
+  .voice-card { background: white; padding: 1.25rem 1.5rem; display: none; }
+  .voice-card.visible { display: block; }
+
+  .voice-text {
+    font-size: 0.95rem;
+    line-height: 1.65;
+    margin-bottom: 0.75rem;
+    color: var(--ink);
+  }
+
+  .voice-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: 2px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .tag-cannabinoid { background: #F0EBF8; color: #5B2D8E; }
+  .tag-symptom { background: #E8F4F0; color: #1D5C45; }
+  .tag-positive { background: #E8F4E8; color: #1D5C1D; }
+  .tag-mixed { background: #FDF3E3; color: #7A4A0A; }
+  .tag-negative { background: #FDE8E8; color: #8B1D1D; }
+
+  .load-more {
+    width: 100%;
+    padding: 12px;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--mid);
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-top: 1px;
+  }
+
+  .load-more:hover { border-color: var(--ink); color: var(--ink); }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 2.5rem;
+  }
+
+  .stat-cell { background: white; padding: 1.25rem; }
+
+  .stat-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--mid);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .privacy-note {
+    font-size: 12px;
+    color: var(--mid);
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+  }
+
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 1.5rem 2rem;
+    max-width: 1100px;
+    margin: 3rem auto 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .footer-credit {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--mid);
+    letter-spacing: 0.05em;
+  }
+
+  .disclaimer { font-size: 11px; color: var(--mid); max-width: 480px; line-height: 1.5; }
+
+  @media (max-width: 600px) {
+    header, main { padding: 1.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="eyebrow">Cannabis Patient Experience Research · Personal project</p>
+  <h1>What patients say<br><em>actually</em> works.</h1>
+  <p class="lead">Patterns from public online cannabis communities — showing which cannabinoids people report helping specific symptoms, and how.</p>
+  <p class="meta">Sources: r/CBD · r/MMJ · r/MedicalMarijuana · r/hempflowers · r/marijuana · r/trees · n=5,928 posts</p>
+</header>
+
+<main>
+
+  <div class="stats-row">
+    <div class="stat-cell">
+      <div class="stat-num">5,928</div>
+      <div class="stat-label">Posts analyzed</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num">6</div>
+      <div class="stat-label">Subreddits</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num">22%</div>
+      <div class="stat-label">Positive outcomes</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num">14</div>
+      <div class="stat-label">Symptoms tracked</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num">10</div>
+      <div class="stat-label">Cannabinoids tracked</div>
+    </div>
+  </div>
+
+  <div class="filter-section">
+    <span class="filter-label">Filter by cannabinoid</span>
+    <div class="filter-row" id="cannabinoid-filters">
+      <button class="filter-btn active" onclick="filterBy('all', this)">All</button>
+      <button class="filter-btn thc" onclick="filterBy('THC', this)">THC</button>
+      <button class="filter-btn cbd" onclick="filterBy('CBD', this)">CBD</button>
+      <button class="filter-btn cbg" onclick="filterBy('CBG', this)">CBG</button>
+      <button class="filter-btn cbn" onclick="filterBy('CBN', this)">CBN</button>
+      <button class="filter-btn full" onclick="filterBy('Full_Spectrum', this)">Full Spectrum</button>
+    </div>
+  </div>
+
+  <div class="section-head">
+    <h2>By symptom</h2>
+    <span class="count-badge">14 symptoms</span>
+  </div>
+
+  <div class="cards-grid" id="symptom-cards">
+    <div class="symptom-card" data-symptom="Chronic Pain">
+      <div class="symptom-name">Chronic Pain</div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">CBD</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%; background:var(--cbd);"></div></div>
+          <span class="bar-count">425</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:96%; background:var(--thc);"></div></div>
+          <span class="bar-count">408</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBG</span>
+          <div class="bar-track"><div class="bar-fill" style="width:15%; background:var(--cbg);"></div></div>
+          <span class="bar-count">65</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Full_Spectrum</span>
+          <div class="bar-track"><div class="bar-fill" style="width:11%; background:var(--full);"></div></div>
+          <span class="bar-count">45</span>
+        </div>
+      </div>
+      <div class="top-combo">🏆 Most reported: <strong>CBD</strong> — mentioned in 34% of posts discussing chronic pain</div>
+    </div>
+
+    <div class="symptom-card" data-symptom="Anxiety &amp; PTSD">
+      <div class="symptom-name">Anxiety &amp; PTSD</div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">CBD</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%; background:var(--cbd);"></div></div>
+          <span class="bar-count">642</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:82%; background:var(--thc);"></div></div>
+          <span class="bar-count">526</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBG</span>
+          <div class="bar-track"><div class="bar-fill" style="width:12%; background:var(--cbg);"></div></div>
+          <span class="bar-count">79</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Full_Spectrum</span>
+          <div class="bar-track"><div class="bar-fill" style="width:12%; background:var(--full);"></div></div>
+          <span class="bar-count">78</span>
+        </div>
+      </div>
+      <div class="top-combo">🏆 Most reported: <strong>CBD</strong> — mentioned in 43% of posts discussing anxiety &amp; ptsd</div>
+    </div>
+
+    <div class="symptom-card" data-symptom="Sleep &amp; Insomnia">
+      <div class="symptom-name">Sleep &amp; Insomnia</div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">CBD</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%; background:var(--cbd);"></div></div>
+          <span class="bar-count">392</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:85%; background:var(--thc);"></div></div>
+          <span class="bar-count">334</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBN</span>
+          <div class="bar-track"><div class="bar-fill" style="width:28%; background:var(--cbn);"></div></div>
+          <span class="bar-count">109</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Full_Spectrum</span>
+          <div class="bar-track"><div class="bar-fill" style="width:15%; background:var(--full);"></div></div>
+          <span class="bar-count">59</span>
+        </div>
+      </div>
+      <div class="top-combo">🏆 Most reported: <strong>CBD</strong> — mentioned in 42% of posts discussing sleep &amp; insomnia</div>
+    </div>
+
+    <div class="symptom-card" data-symptom="Nausea &amp; GI">
+      <div class="symptom-name">Nausea &amp; GI</div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%; background:var(--thc);"></div></div>
+          <span class="bar-count">61</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD</span>
+          <div class="bar-track"><div class="bar-fill" style="width:80%; background:var(--cbd);"></div></div>
+          <span class="bar-count">49</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBG</span>
+          <div class="bar-track"><div class="bar-fill" style="width:11%; background:var(--cbg);"></div></div>
+          <span class="bar-count">7</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBN</span>
+          <div class="bar-track"><div class="bar-fill" style="width:7%; background:var(--cbn);"></div></div>
+          <span class="bar-count">4</span>
+        </div>
+      </div>
+      <div class="top-combo">🏆 Most reported: <strong>THC</strong> — mentioned in 32% of posts discussing nausea &amp; gi</div>
+    </div>
+
+    <div class="symptom-card" data-symptom="Depression &amp; Mood">
+      <div class="symptom-name">Depression &amp; Mood</div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%; background:var(--thc);"></div></div>
+          <span class="bar-count">92</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD</span>
+          <div class="bar-track"><div class="bar-fill" style="width:97%; background:var(--cbd);"></div></div>
+          <span class="bar-count">89</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBG</span>
+          <div class="bar-track"><div class="bar-fill" style="width:26%; background:var(--cbg);"></div></div>
+          <span class="bar-count">24</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Full_Spectrum</span>
+          <div class="bar-track"><div class="bar-fill" style="width:20%; background:var(--full);"></div></div>
+          <span class="bar-count">18</span>
+        </div>
+      </div>
+      <div class="top-combo">🏆 Most reported: <strong>THC</strong> — mentioned in 30% of posts discussing depression &amp; mood</div>
+    </div>
+
+    <div class="symptom-card" data-symptom="Appetite">
+      <div class="symptom-name">Appetite</div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%; background:var(--thc);"></div></div>
+          <span class="bar-count">121</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD</span>
+          <div class="bar-track"><div class="bar-fill" style="width:77%; background:var(--cbd);"></div></div>
+          <span class="bar-count">93</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBG</span>
+          <div class="bar-track"><div class="bar-fill" style="width:14%; background:var(--cbg);"></div></div>
+          <span class="bar-count">17</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBN</span>
+          <div class="bar-track"><div class="bar-fill" style="width:9%; background:var(--cbn);"></div></div>
+          <span class="bar-count">11</span>
+        </div>
+      </div>
+      <div class="top-combo">🏆 Most reported: <strong>THC</strong> — mentioned in 34% of posts discussing appetite</div>
+    </div>
+
+    <div class="symptom-card" data-symptom="Inflammation &amp; IBS">
+      <div class="symptom-name">Inflammation &amp; IBS</div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">CBD</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%; background:var(--cbd);"></div></div>
+          <span class="bar-count">64</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:75%; background:var(--thc);"></div></div>
+          <span class="bar-count">48</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBG</span>
+          <div class="bar-track"><div class="bar-fill" style="width:23%; background:var(--cbg);"></div></div>
+          <span class="bar-count">15</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Full_Spectrum</span>
+          <div class="bar-track"><div class="bar-fill" style="width:14%; background:var(--full);"></div></div>
+          <span class="bar-count">9</span>
+        </div>
+      </div>
+      <div class="top-combo">🏆 Most reported: <strong>CBD</strong> — mentioned in 49% of posts discussing inflammation &amp; ibs</div>
+    </div>
+
+    <div class="symptom-card" data-symptom="Seizures">
+      <div class="symptom-name">Seizures</div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%; background:var(--thc);"></div></div>
+          <span class="bar-count">20</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD</span>
+          <div class="bar-track"><div class="bar-fill" style="width:90%; background:var(--cbd);"></div></div>
+          <span class="bar-count">18</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">THCA</span>
+          <div class="bar-track"><div class="bar-fill" style="width:15%; background:var(--full);"></div></div>
+          <span class="bar-count">3</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Full_Spectrum</span>
+          <div class="bar-track"><div class="bar-fill" style="width:15%; background:var(--full);"></div></div>
+          <span class="bar-count">3</span>
+        </div>
+      </div>
+      <div class="top-combo">🏆 Most reported: <strong>THC</strong> — mentioned in 32% of posts discussing seizures</div>
+    </div>
+
+    <div class="symptom-card" data-symptom="CHS">
+      <div class="symptom-name">CHS</div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%; background:var(--thc);"></div></div>
+          <span class="bar-count">9</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD</span>
+          <div class="bar-track"><div class="bar-fill" style="width:67%; background:var(--cbd);"></div></div>
+          <span class="bar-count">6</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBG</span>
+          <div class="bar-track"><div class="bar-fill" style="width:11%; background:var(--cbg);"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:11%; background:var(--full);"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+      </div>
+      <div class="top-combo">🏆 Most reported: <strong>THC</strong> — mentioned in 20% of posts discussing chs</div>
+    </div>
+
+    <div class="symptom-card" data-symptom="Cancer / Chemo">
+      <div class="symptom-name">Cancer / Chemo</div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%; background:var(--thc);"></div></div>
+          <span class="bar-count">47</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD</span>
+          <div class="bar-track"><div class="bar-fill" style="width:89%; background:var(--cbd);"></div></div>
+          <span class="bar-count">42</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Full_Spectrum</span>
+          <div class="bar-track"><div class="bar-fill" style="width:17%; background:var(--full);"></div></div>
+          <span class="bar-count">8</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBG</span>
+          <div class="bar-track"><div class="bar-fill" style="width:15%; background:var(--cbg);"></div></div>
+          <span class="bar-count">7</span>
+        </div>
+      </div>
+      <div class="top-combo">🏆 Most reported: <strong>THC</strong> — mentioned in 32% of posts discussing cancer / chemo</div>
+    </div>
+
+    <div class="symptom-card" data-symptom="ADHD &amp; Focus">
+      <div class="symptom-name">ADHD &amp; Focus</div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">CBD</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%; background:var(--cbd);"></div></div>
+          <span class="bar-count">310</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:94%; background:var(--thc);"></div></div>
+          <span class="bar-count">290</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBG</span>
+          <div class="bar-track"><div class="bar-fill" style="width:25%; background:var(--cbg);"></div></div>
+          <span class="bar-count">78</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">THCA</span>
+          <div class="bar-track"><div class="bar-fill" style="width:15%; background:var(--full);"></div></div>
+          <span class="bar-count">45</span>
+        </div>
+      </div>
+      <div class="top-combo">🏆 Most reported: <strong>CBD</strong> — mentioned in 36% of posts discussing adhd &amp; focus</div>
+    </div>
+
+    <div class="symptom-card" data-symptom="Migraines">
+      <div class="symptom-name">Migraines</div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">CBD</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%; background:var(--cbd);"></div></div>
+          <span class="bar-count">43</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:95%; background:var(--thc);"></div></div>
+          <span class="bar-count">41</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBG</span>
+          <div class="bar-track"><div class="bar-fill" style="width:16%; background:var(--cbg);"></div></div>
+          <span class="bar-count">7</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBN</span>
+          <div class="bar-track"><div class="bar-fill" style="width:12%; background:var(--cbn);"></div></div>
+          <span class="bar-count">5</span>
+        </div>
+      </div>
+      <div class="top-combo">🏆 Most reported: <strong>CBD</strong> — mentioned in 32% of posts discussing migraines</div>
+    </div>
+
+    <div class="symptom-card" data-symptom="Spasms">
+      <div class="symptom-name">Spasms</div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">CBD</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%; background:var(--cbd);"></div></div>
+          <span class="bar-count">398</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:92%; background:var(--thc);"></div></div>
+          <span class="bar-count">367</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBG</span>
+          <div class="bar-track"><div class="bar-fill" style="width:18%; background:var(--cbg);"></div></div>
+          <span class="bar-count">73</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Full_Spectrum</span>
+          <div class="bar-track"><div class="bar-fill" style="width:13%; background:var(--full);"></div></div>
+          <span class="bar-count">53</span>
+        </div>
+      </div>
+      <div class="top-combo">🏆 Most reported: <strong>CBD</strong> — mentioned in 33% of posts discussing spasms</div>
+    </div>
+
+    <div class="symptom-card" data-symptom="Opioid Substitution">
+      <div class="symptom-name">Opioid Substitution</div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%; background:var(--thc);"></div></div>
+          <span class="bar-count">17</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD</span>
+          <div class="bar-track"><div class="bar-fill" style="width:71%; background:var(--cbd);"></div></div>
+          <span class="bar-count">12</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBG</span>
+          <div class="bar-track"><div class="bar-fill" style="width:18%; background:var(--cbg);"></div></div>
+          <span class="bar-count">3</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Full_Spectrum</span>
+          <div class="bar-track"><div class="bar-fill" style="width:12%; background:var(--full);"></div></div>
+          <span class="bar-count">2</span>
+        </div>
+      </div>
+      <div class="top-combo">🏆 Most reported: <strong>THC</strong> — mentioned in 40% of posts discussing opioid substitution</div>
+    </div>
+  </div>
+
+  <div class="section-head">
+    <h2>Patient voices</h2>
+    <span class="count-badge">Representative excerpts, genericized for privacy</span>
+  </div>
+
+  <div class="privacy-note">
+    Excerpts below are drawn from real posts but have identifying specifics (exact durations, named medications, procedures) removed or generalized, and are not linked to their source post, subreddit, or account — so they can't be traced back to the person who wrote them.
+  </div>
+
+  <div class="voices-grid" id="voices-list">
+    <div class="voice-card visible" data-cannabinoids="THC" data-symptom="Anxiety &amp; PTSD">
+      <p class="voice-text">"Will I ever be able to enjoy weed again after my last experiences were just me being paranoid?. Hey yall wanna smoke weed after not smoking for about 4/an extended period."</p>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">THC</span>
+        <span class="tag tag-symptom">Anxiety &amp; PTSD</span>
+        
+      </div>
+    </div>
+
+    <div class="voice-card visible" data-cannabinoids="THC CBD THCA" data-symptom="Spasms">
+      <p class="voice-text">"Hemp Bill Shortened by AI. (ChatGPT Pro) short version of hemp bill: Congress just rewrote the federal definition of “hemp” inside the shutdown‑ending spending bill."</p>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">THC</span><span class="tag tag-cannabinoid">CBD</span>
+        <span class="tag tag-symptom">Spasms</span>
+        <span class="tag tag-positive">Positive</span>
+      </div>
+    </div>
+
+    <div class="voice-card visible" data-cannabinoids="CBN" data-symptom="Sleep &amp; Insomnia">
+      <p class="voice-text">"CBN live resin or rosin?. Anyone found a good CBN wax for sleep?"</p>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">CBN</span>
+        <span class="tag tag-symptom">Sleep &amp; Insomnia</span>
+        
+      </div>
+    </div>
+
+    <div class="voice-card visible" data-cannabinoids="CBD" data-symptom="Chronic Pain">
+      <p class="voice-text">"I have serious back pain any time I lay down or bend over. I&#x27;ve just started to notice it this past year but it&#x27;s slowly getting worse I want to get a medical card because ik CBD would help and I don&#x27;t wanna be on Opiods or pills because I don&#x27;t like taking…"</p>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">CBD</span>
+        <span class="tag tag-symptom">Chronic Pain</span>
+        <span class="tag tag-negative">Warning</span>
+      </div>
+    </div>
+
+    <div class="voice-card" data-cannabinoids="THC CBD" data-symptom="Appetite">
+      <p class="voice-text">"THC/CBD fat soluble?. When ingesting THC (d9, rso, etc) anyone else notice massive differences in effect/absorption based on stomach contents?"</p>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">THC</span><span class="tag tag-cannabinoid">CBD</span>
+        <span class="tag tag-symptom">Appetite</span>
+        
+      </div>
+    </div>
+
+    <div class="voice-card" data-cannabinoids="THC CBD THCA" data-symptom="Depression &amp; Mood">
+      <p class="voice-text">"Need some vendors recommendations for CBD. So basically, I could use some vendor recommendations for good CBD and perhaps even good CBD bulk flower if anyone has some."</p>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">THC</span><span class="tag tag-cannabinoid">CBD</span>
+        <span class="tag tag-symptom">Depression &amp; Mood</span><span class="tag tag-symptom">Seizures</span>
+        
+      </div>
+    </div>
+
+    <div class="voice-card" data-cannabinoids="THC" data-symptom="ADHD &amp; Focus">
+      <p class="voice-text">"Best firecracker recipe you’s have? (Also have another question in the post)."</p>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">THC</span>
+        <span class="tag tag-symptom">ADHD &amp; Focus</span>
+        
+      </div>
+    </div>
+
+    <div class="voice-card" data-cannabinoids="THC CBD" data-symptom="Cancer / Chemo">
+      <p class="voice-text">"Return to weed after years. Hey everybody, I&#x27;d like your input/advice."</p>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">THC</span><span class="tag tag-cannabinoid">CBD</span>
+        <span class="tag tag-symptom">Cancer / Chemo</span><span class="tag tag-symptom">ADHD &amp; Focus</span>
+        <span class="tag tag-negative">Warning</span>
+      </div>
+    </div>
+
+    <div class="voice-card" data-cannabinoids="CBD" data-symptom="Nausea &amp; GI">
+      <p class="voice-text">"if you have started vomiting a lot lately and you are a heavy user of weed then you most likely have Cannabinoid hyperemesis syndrome there is an easy way to fix this. You need a decent dose of CBD  (for me the dose was quite high) it has completely gone away…"</p>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">CBD</span>
+        <span class="tag tag-symptom">Nausea &amp; GI</span><span class="tag tag-symptom">Appetite</span>
+        <span class="tag tag-positive">Positive</span>
+      </div>
+    </div>
+
+    <div class="voice-card" data-cannabinoids="CBD CBG" data-symptom="Inflammation &amp; IBS">
+      <p class="voice-text">"Should I give up on my search for the right cannabis?. **Is there such a thing as cannabis that provides focus, energy, and also helps reduce inflammation?**
+
+I&#x27;ve tried many different strains over the years and all they do is get me high (which is fun, don&#x27;t…"</p>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">CBD</span><span class="tag tag-cannabinoid">CBG</span>
+        <span class="tag tag-symptom">Inflammation &amp; IBS</span><span class="tag tag-symptom">ADHD &amp; Focus</span>
+        <span class="tag tag-positive">Positive</span>
+      </div>
+    </div>
+
+    <div class="voice-card" data-cannabinoids="THC" data-symptom="Seizures">
+      <p class="voice-text">"How to fix impending doom caused by medical marijuana?. Last October I finally received my medical card after an extended period of fighting for it."</p>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">THC</span>
+        <span class="tag tag-symptom">Seizures</span>
+        <span class="tag tag-mixed">Mixed</span>
+      </div>
+    </div>
+
+    <div class="voice-card" data-cannabinoids="THC CBD" data-symptom="Migraines">
+      <p class="voice-text">"tincture recommendation for migraines?. I’m looking for a tincture with similar thc to cbd ratio as Dixie Synergy Dew Drops."</p>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">THC</span><span class="tag tag-cannabinoid">CBD</span>
+        <span class="tag tag-symptom">Migraines</span>
+        
+      </div>
+    </div>
+  </div>
+
+  <button class="load-more" onclick="loadMore()">Load more patient voices ↓</button>
+
+</main>
+
+<footer>
+  <div class="footer-credit">Personal research project</div>
+  <p class="disclaimer">This page presents aggregated, anonymized, and genericized patient-reported experiences from public online communities for personal research purposes. It does not constitute medical advice.</p>
+</footer>
+
+<script>
+  let visibleCount = 4;
+
+  function filterBy(cannabinoid, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const voices = document.querySelectorAll('.voice-card');
+    voices.forEach(card => {
+      if (cannabinoid === 'all') {
+        card.style.display = '';
+      } else {
+        const cb = card.dataset.cannabinoids || '';
+        card.style.display = cb.includes(cannabinoid) ? '' : 'none';
+      }
+    });
+
+    const visible = Array.from(voices).filter(c => c.style.display !== 'none');
+    visible.forEach((card, i) => {
+      card.classList.toggle('visible', i < visibleCount);
+    });
+  }
+
+  function loadMore() {
+    visibleCount += 4;
+    const hidden = document.querySelectorAll('.voice-card:not(.visible)');
+    let shown = 0;
+    hidden.forEach(card => {
+      if (shown < 4 && card.style.display !== 'none') {
+        card.classList.add('visible');
+        shown++;
+      }
+    });
+    if (document.querySelectorAll('.voice-card:not(.visible)').length === 0) {
+      document.querySelector('.load-more').style.display = 'none';
+    }
+  }
+</script>
+
+</body>
+</html>
