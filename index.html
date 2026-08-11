@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What Patients Say — Cannabis & Terpene Experience Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600&family=DM+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:#1A1A1A; --mid:#6B6B6B; --paper:#FAF9F6; --line:#E5E2DB;
+    --positive:#1D5C1D; --cbd:#5B2D8E; --thc:#C0392B; --cbg:#1D5C45;
+    --cbn:#7A4A0A; --full:#2C5F8A; --accent:#1D5C45;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink); font-family:'DM Sans',sans-serif; }
+  header { padding:2.5rem 2rem 1.5rem; max-width:1320px; margin:0 auto; }
+  .eyebrow { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--mid); margin-bottom:.75rem; }
+  h1 { font-family:'DM Serif Display',serif; font-size:2.6rem; line-height:1.1; margin:0 0 1rem; }
+  h1 em { font-style:italic; }
+  .lead { font-size:1.05rem; color:var(--mid); max-width:640px; line-height:1.6; margin-bottom:.5rem; }
+  .meta { font-family:'DM Mono',monospace; font-size:11px; color:var(--mid); }
+  .layout { max-width:1320px; margin:0 auto; padding:0 2rem 3rem; display:grid; grid-template-columns:230px 1fr; gap:2rem; align-items:start; }
+  aside.sidebar { position:sticky; top:1.5rem; background:white; border:1px solid var(--line); border-radius:2px; padding:1.25rem 1rem; max-height:calc(100vh - 3rem); overflow-y:auto; }
+  .sidebar-title { font-family:'DM Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--mid); margin-bottom:.85rem; }
+  .filter-list { display:flex; flex-direction:column; gap:2px; }
+  .filter-btn { text-align:left; background:none; border:none; border-radius:2px; padding:7px 8px; font-family:'DM Sans',sans-serif; font-size:.82rem; color:var(--ink); cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:6px; }
+  .filter-btn:hover { background:var(--paper); }
+  .filter-btn.active { background:var(--accent); color:white; }
+  .filter-btn.active .filter-count { color:white; opacity:.85; }
+  .filter-count { font-family:'DM Mono',monospace; font-size:10px; color:var(--mid); }
+  main { min-width:0; }
+  .stats-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:2px; overflow:hidden; margin:1.5rem 0 2.5rem; }
+  .stat-cell { background:white; padding:1.25rem; }
+  .stat-num { font-family:'DM Serif Display',serif; font-size:1.9rem; line-height:1; margin-bottom:4px; }
+  .stat-label { font-family:'DM Mono',monospace; font-size:10.5px; color:var(--mid); letter-spacing:.05em; text-transform:uppercase; }
+  .section-head { display:flex; justify-content:space-between; align-items:baseline; margin:2.5rem 0 1rem; }
+  .section-head h2 { font-family:'DM Serif Display',serif; font-size:1.5rem; margin:0; }
+  .section-sub { font-size:.85rem; color:var(--mid); margin:-0.5rem 0 1rem; max-width:600px; }
+  .count-badge { font-family:'DM Mono',monospace; font-size:11px; color:var(--mid); background:white; border:1px solid var(--line); padding:3px 8px; border-radius:2px; }
+  .cards-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:1rem; }
+  .symptom-card { background:white; border:1px solid var(--line); border-radius:2px; padding:1.25rem; }
+  .symptom-name { font-weight:600; font-size:1.05rem; margin-bottom:.9rem; display:flex; justify-content:space-between; align-items:center; }
+  .card-tag { font-family:'DM Mono',monospace; font-size:9px; text-transform:uppercase; letter-spacing:.05em; color:var(--mid); background:var(--paper); border:1px solid var(--line); padding:2px 6px; border-radius:2px; font-weight:400; }
+  .bar-row { display:grid; grid-template-columns:110px 1fr 40px; align-items:center; gap:8px; margin-bottom:8px; font-size:.8rem; }
+  .bar-label { color:var(--mid); }
+  .bar-track { height:8px; background:var(--line); border-radius:4px; overflow:hidden; }
+  .bar-fill { height:100%; background:var(--thc); border-radius:4px; }
+  .bar-count { text-align:right; font-family:'DM Mono',monospace; font-size:.75rem; color:var(--mid); }
+  .top-combo { font-size:.8rem; color:var(--mid); border-top:1px solid var(--line); padding-top:.75rem; margin-top:.5rem; }
+  .combo-panels { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1rem; margin-bottom:2.5rem; }
+  .combo-panel { background:white; border:1px solid var(--line); border-radius:2px; padding:1rem 1.25rem 1.25rem; }
+  .combo-panel h3 { font-family:'DM Sans',sans-serif; font-size:.85rem; font-weight:600; margin:0 0 .25rem; }
+  .combo-panel-sub { font-size:.75rem; color:var(--mid); margin:0 0 .75rem; }
+  .combo-list { max-height:340px; overflow-y:auto; border-top:1px solid var(--line); }
+  .combo-row { display:flex; justify-content:space-between; align-items:center; padding:6px 2px; border-bottom:1px solid var(--line); font-size:.82rem; gap:8px; }
+  .combo-row:last-child { border-bottom:none; }
+  .combo-name { color:var(--ink); }
+  .combo-count { font-family:'DM Mono',monospace; font-size:.75rem; color:var(--mid); flex-shrink:0; }
+  .voices-list { display:flex; flex-direction:column; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:2px; overflow:hidden; margin-bottom:1rem; }
+  .voice-card { background:white; padding:1.25rem 1.5rem; }
+  .voice-text { font-size:.95rem; line-height:1.65; margin-bottom:.75rem; }
+  .voice-meta { display:flex; gap:8px; flex-wrap:wrap; }
+  .tag { display:inline-flex; align-items:center; padding:3px 8px; border-radius:2px; font-family:'DM Mono',monospace; font-size:10px; letter-spacing:.05em; text-transform:uppercase; font-weight:500; text-decoration:none; }
+  .tag-cannabinoid { background:#F0EBF8; color:#5B2D8E; }
+  .tag-symptom { background:#E8F4F0; color:#1D5C45; }
+  .tag-positive { background:#E8F4E8; color:#1D5C1D; }
+  .tag-mixed { background:#FDF3E3; color:#7A4A0A; }
+  .tag-negative { background:#FDE8E8; color:#8B1D1D; }
+  .tag-source { background:var(--paper); color:var(--mid); border:1px solid var(--line); }
+  .empty-note { font-size:.85rem; color:var(--mid); font-style:italic; padding:1rem; display:none; }
+  .methodology { background:white; border:1px solid var(--line); border-radius:2px; padding:1.5rem 1.75rem; margin-top:2.5rem; font-size:.88rem; color:var(--mid); line-height:1.6; }
+  .methodology h3 { font-family:'DM Serif Display',serif; font-size:1.15rem; color:var(--ink); margin:0 0 .6rem; }
+  .methodology a { color:var(--ink); }
+  footer { border-top:1px solid var(--line); padding:1.5rem 2rem; max-width:1320px; margin:2rem auto 0; font-family:'DM Mono',monospace; font-size:11px; color:var(--mid); }
+  @media (max-width:900px) {
+    .layout { grid-template-columns:1fr; }
+    aside.sidebar { position:static; max-height:none; }
+    .filter-list { flex-direction:row; flex-wrap:wrap; }
+  }
+  @media (max-width:600px) { header { padding-left:1.25rem; padding-right:1.25rem; } .layout { padding-left:1.25rem; padding-right:1.25rem; } h1 { font-size:2rem; } .bar-row { grid-template-columns:85px 1fr 34px; } }
+</style>
+</head>
+<body>
+<header>
+  <p class="eyebrow">Cannabis & Terpene Patient Experience · Auto-generated August 11, 2026</p>
+  <h1>What patients say<br><em>actually</em> helps.</h1>
+  <p class="lead">Real posts from public cannabis communities on Reddit, analyzed for which cannabinoids and terpenes people report using for specific symptoms — and whether they say it helped.</p>
+  <p class="meta">14 subreddits · 6,261 posts · 2016-08-14 to 2026-08-11</p>
+</header>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-title">Filter by symptom</div>
+    <div class="filter-list">
+    <button class="filter-btn active" data-symptom="all">All symptoms</button>
+    <button class="filter-btn" data-symptom="Sleep">Sleep <span class="filter-count">2988</span></button>
+    <button class="filter-btn" data-symptom="Anxiety">Anxiety <span class="filter-count">2644</span></button>
+    <button class="filter-btn" data-symptom="Pain">Pain <span class="filter-count">2566</span></button>
+    <button class="filter-btn" data-symptom="Spasms">Spasms <span class="filter-count">1725</span></button>
+    <button class="filter-btn" data-symptom="ADHD">ADHD <span class="filter-count">1332</span></button>
+    <button class="filter-btn" data-symptom="Depression">Depression <span class="filter-count">730</span></button>
+    <button class="filter-btn" data-symptom="Appetite">Appetite <span class="filter-count">671</span></button>
+    <button class="filter-btn" data-symptom="Migraine">Migraine <span class="filter-count">372</span></button>
+    <button class="filter-btn" data-symptom="Nausea">Nausea <span class="filter-count">326</span></button>
+    <button class="filter-btn" data-symptom="Inflammation">Inflammation <span class="filter-count">242</span></button>
+    <button class="filter-btn" data-symptom="Opioid_Substitution">Opioid Substitution <span class="filter-count">149</span></button>
+    <button class="filter-btn" data-symptom="Cancer">Cancer <span class="filter-count">122</span></button>
+    <button class="filter-btn" data-symptom="Seizures">Seizures <span class="filter-count">90</span></button>
+    <button class="filter-btn" data-symptom="CHS">CHS <span class="filter-count">64</span></button>
+    </div>
+  </aside>
+  <main>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-num">6,261</div><div class="stat-label">Posts analyzed</div></div>
+      <div class="stat-cell"><div class="stat-num">14</div><div class="stat-label">Subreddits</div></div>
+      <div class="stat-cell"><div class="stat-num">52.5%</div><div class="stat-label">Positive outcomes</div></div>
+      <div class="stat-cell"><div class="stat-num">14</div><div class="stat-label">Symptoms tracked</div></div>
+      <div class="stat-cell"><div class="stat-num">10</div><div class="stat-label">Cannabinoids tracked</div></div>
+      <div class="stat-cell"><div class="stat-num">10</div><div class="stat-label">Terpenes tracked</div></div>
+    </div>
+
+    <div class="section-head"><h2>By symptom — cannabinoids</h2><span class="count-badge">every symptom with data</span></div>
+    <p class="section-sub">How often each cannabinoid appears alongside a symptom in the same post. Bar length is relative within each card, not an absolute comparison across cards.</p>
+    <div class="cards-grid" id="cb-grid">
+    <div class="symptom-card" data-symptom="Anxiety">
+      <div class="symptom-name">Anxiety <span class="card-tag">cannabinoid</span></div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">CBD + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">203</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:96%;"></div></div>
+          <span class="bar-count">195</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD</span>
+          <div class="bar-track"><div class="bar-fill" style="width:77%;"></div></div>
+          <span class="bar-count">157</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">THC + THCA</span>
+          <div class="bar-track"><div class="bar-fill" style="width:14%;"></div></div>
+          <span class="bar-count">29</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + Full Spectrum + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:10%;"></div></div>
+          <span class="bar-count">21</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + Full Spectrum</span>
+          <div class="bar-track"><div class="bar-fill" style="width:8%;"></div></div>
+          <span class="bar-count">17</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + THC + THCA</span>
+          <div class="bar-track"><div class="bar-fill" style="width:6%;"></div></div>
+          <span class="bar-count">13</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + CBN + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:4%;"></div></div>
+          <span class="bar-count">9</span>
+        </div>
+      </div>
+      <div class="top-combo">Most mentioned: <strong>CBD + THC</strong> (203 posts)</div>
+    </div>
+    <div class="symptom-card" data-symptom="Pain">
+      <div class="symptom-name">Pain <span class="card-tag">cannabinoid</span></div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">136</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:98%;"></div></div>
+          <span class="bar-count">133</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD</span>
+          <div class="bar-track"><div class="bar-fill" style="width:71%;"></div></div>
+          <span class="bar-count">96</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">THC + THCA</span>
+          <div class="bar-track"><div class="bar-fill" style="width:46%;"></div></div>
+          <span class="bar-count">63</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + Full Spectrum + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:10%;"></div></div>
+          <span class="bar-count">13</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + Full Spectrum</span>
+          <div class="bar-track"><div class="bar-fill" style="width:7%;"></div></div>
+          <span class="bar-count">10</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + CBN + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:7%;"></div></div>
+          <span class="bar-count">9</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:6%;"></div></div>
+          <span class="bar-count">8</span>
+        </div>
+      </div>
+      <div class="top-combo">Most mentioned: <strong>THC</strong> (136 posts)</div>
+    </div>
+    <div class="symptom-card" data-symptom="Sleep">
+      <div class="symptom-name">Sleep <span class="card-tag">cannabinoid</span></div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">140</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:79%;"></div></div>
+          <span class="bar-count">110</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD</span>
+          <div class="bar-track"><div class="bar-fill" style="width:57%;"></div></div>
+          <span class="bar-count">80</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">THC + THCA</span>
+          <div class="bar-track"><div class="bar-fill" style="width:19%;"></div></div>
+          <span class="bar-count">27</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + Full Spectrum + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:11%;"></div></div>
+          <span class="bar-count">16</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + CBN + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:11%;"></div></div>
+          <span class="bar-count">15</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBN + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:7%;"></div></div>
+          <span class="bar-count">10</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + CBN</span>
+          <div class="bar-track"><div class="bar-fill" style="width:6%;"></div></div>
+          <span class="bar-count">8</span>
+        </div>
+      </div>
+      <div class="top-combo">Most mentioned: <strong>THC</strong> (140 posts)</div>
+    </div>
+    <div class="symptom-card" data-symptom="Spasms">
+      <div class="symptom-name">Spasms <span class="card-tag">cannabinoid</span></div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">143</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:64%;"></div></div>
+          <span class="bar-count">91</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD</span>
+          <div class="bar-track"><div class="bar-fill" style="width:45%;"></div></div>
+          <span class="bar-count">64</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">THC + THCA</span>
+          <div class="bar-track"><div class="bar-fill" style="width:20%;"></div></div>
+          <span class="bar-count">29</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + Full Spectrum</span>
+          <div class="bar-track"><div class="bar-fill" style="width:9%;"></div></div>
+          <span class="bar-count">13</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + Full Spectrum + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:5%;"></div></div>
+          <span class="bar-count">7</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:4%;"></div></div>
+          <span class="bar-count">6</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + CBN + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:4%;"></div></div>
+          <span class="bar-count">6</span>
+        </div>
+      </div>
+      <div class="top-combo">Most mentioned: <strong>THC</strong> (143 posts)</div>
+    </div>
+    <div class="symptom-card" data-symptom="ADHD">
+      <div class="symptom-name">ADHD <span class="card-tag">cannabinoid</span></div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">100</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:89%;"></div></div>
+          <span class="bar-count">89</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD</span>
+          <div class="bar-track"><div class="bar-fill" style="width:60%;"></div></div>
+          <span class="bar-count">60</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">THC + THCA</span>
+          <div class="bar-track"><div class="bar-fill" style="width:27%;"></div></div>
+          <span class="bar-count">27</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + CBN + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:9%;"></div></div>
+          <span class="bar-count">9</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + CBG + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:7%;"></div></div>
+          <span class="bar-count">7</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + Full Spectrum</span>
+          <div class="bar-track"><div class="bar-fill" style="width:6%;"></div></div>
+          <span class="bar-count">6</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + Full Spectrum + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:6%;"></div></div>
+          <span class="bar-count">6</span>
+        </div>
+      </div>
+      <div class="top-combo">Most mentioned: <strong>THC</strong> (100 posts)</div>
+    </div>
+    <div class="symptom-card" data-symptom="Appetite">
+      <div class="symptom-name">Appetite <span class="card-tag">cannabinoid</span></div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">67</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:69%;"></div></div>
+          <span class="bar-count">46</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD</span>
+          <div class="bar-track"><div class="bar-fill" style="width:30%;"></div></div>
+          <span class="bar-count">20</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">THC + THCA</span>
+          <div class="bar-track"><div class="bar-fill" style="width:16%;"></div></div>
+          <span class="bar-count">11</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBN + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:6%;"></div></div>
+          <span class="bar-count">4</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + Full Spectrum</span>
+          <div class="bar-track"><div class="bar-fill" style="width:4%;"></div></div>
+          <span class="bar-count">3</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + CBG + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:4%;"></div></div>
+          <span class="bar-count">3</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + Full Spectrum + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:4%;"></div></div>
+          <span class="bar-count">3</span>
+        </div>
+      </div>
+      <div class="top-combo">Most mentioned: <strong>THC</strong> (67 posts)</div>
+    </div>
+    <div class="symptom-card" data-symptom="Depression">
+      <div class="symptom-name">Depression <span class="card-tag">cannabinoid</span></div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">47</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:79%;"></div></div>
+          <span class="bar-count">37</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD</span>
+          <div class="bar-track"><div class="bar-fill" style="width:77%;"></div></div>
+          <span class="bar-count">36</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">THC + THCA</span>
+          <div class="bar-track"><div class="bar-fill" style="width:23%;"></div></div>
+          <span class="bar-count">11</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + Full Spectrum</span>
+          <div class="bar-track"><div class="bar-fill" style="width:11%;"></div></div>
+          <span class="bar-count">5</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + CBN + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:9%;"></div></div>
+          <span class="bar-count">4</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Full Spectrum + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:4%;"></div></div>
+          <span class="bar-count">2</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + THC + THCA</span>
+          <div class="bar-track"><div class="bar-fill" style="width:4%;"></div></div>
+          <span class="bar-count">2</span>
+        </div>
+      </div>
+      <div class="top-combo">Most mentioned: <strong>THC</strong> (47 posts)</div>
+    </div>
+    <div class="symptom-card" data-symptom="Nausea">
+      <div class="symptom-name">Nausea <span class="card-tag">cannabinoid</span></div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">44</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:48%;"></div></div>
+          <span class="bar-count">21</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD</span>
+          <div class="bar-track"><div class="bar-fill" style="width:34%;"></div></div>
+          <span class="bar-count">15</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">THC + THCA</span>
+          <div class="bar-track"><div class="bar-fill" style="width:9%;"></div></div>
+          <span class="bar-count">4</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + Delta8 + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:5%;"></div></div>
+          <span class="bar-count">2</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + Full Spectrum + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:5%;"></div></div>
+          <span class="bar-count">2</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + CBG + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:5%;"></div></div>
+          <span class="bar-count">2</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + CBN + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:5%;"></div></div>
+          <span class="bar-count">2</span>
+        </div>
+      </div>
+      <div class="top-combo">Most mentioned: <strong>THC</strong> (44 posts)</div>
+    </div>
+    <div class="symptom-card" data-symptom="Migraine">
+      <div class="symptom-name">Migraine <span class="card-tag">cannabinoid</span></div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">24</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:83%;"></div></div>
+          <span class="bar-count">20</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD</span>
+          <div class="bar-track"><div class="bar-fill" style="width:50%;"></div></div>
+          <span class="bar-count">12</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">THC + THCA</span>
+          <div class="bar-track"><div class="bar-fill" style="width:46%;"></div></div>
+          <span class="bar-count">11</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:12%;"></div></div>
+          <span class="bar-count">3</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBG + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:8%;"></div></div>
+          <span class="bar-count">2</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + Full Spectrum</span>
+          <div class="bar-track"><div class="bar-fill" style="width:8%;"></div></div>
+          <span class="bar-count">2</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + CBN + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:8%;"></div></div>
+          <span class="bar-count">2</span>
+        </div>
+      </div>
+      <div class="top-combo">Most mentioned: <strong>THC</strong> (24 posts)</div>
+    </div>
+    <div class="symptom-card" data-symptom="Inflammation">
+      <div class="symptom-name">Inflammation <span class="card-tag">cannabinoid</span></div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">CBD + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">16</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD</span>
+          <div class="bar-track"><div class="bar-fill" style="width:94%;"></div></div>
+          <span class="bar-count">15</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:44%;"></div></div>
+          <span class="bar-count">7</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + Full Spectrum + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:25%;"></div></div>
+          <span class="bar-count">4</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + CBN + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:19%;"></div></div>
+          <span class="bar-count">3</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">THC + THCA</span>
+          <div class="bar-track"><div class="bar-fill" style="width:19%;"></div></div>
+          <span class="bar-count">3</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:12%;"></div></div>
+          <span class="bar-count">2</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBG</span>
+          <div class="bar-track"><div class="bar-fill" style="width:12%;"></div></div>
+          <span class="bar-count">2</span>
+        </div>
+      </div>
+      <div class="top-combo">Most mentioned: <strong>CBD + THC</strong> (16 posts)</div>
+    </div>
+    <div class="symptom-card" data-symptom="Cancer">
+      <div class="symptom-name">Cancer <span class="card-tag">cannabinoid</span></div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">CBD + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">17</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD</span>
+          <div class="bar-track"><div class="bar-fill" style="width:41%;"></div></div>
+          <span class="bar-count">7</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:29%;"></div></div>
+          <span class="bar-count">5</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">THC + THCA</span>
+          <div class="bar-track"><div class="bar-fill" style="width:18%;"></div></div>
+          <span class="bar-count">3</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + Full Spectrum</span>
+          <div class="bar-track"><div class="bar-fill" style="width:18%;"></div></div>
+          <span class="bar-count">3</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + Delta8 + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:6%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + CBG + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:6%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + CBN + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:6%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+      </div>
+      <div class="top-combo">Most mentioned: <strong>CBD + THC</strong> (17 posts)</div>
+    </div>
+    <div class="symptom-card" data-symptom="Opioid_Substitution">
+      <div class="symptom-name">Opioid Substitution <span class="card-tag">cannabinoid</span></div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">12</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:75%;"></div></div>
+          <span class="bar-count">9</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">THC + THCA</span>
+          <div class="bar-track"><div class="bar-fill" style="width:33%;"></div></div>
+          <span class="bar-count">4</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBG + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:8%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + THC + THCV</span>
+          <div class="bar-track"><div class="bar-fill" style="width:8%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + Full Spectrum + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:8%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBN + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:8%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD</span>
+          <div class="bar-track"><div class="bar-fill" style="width:8%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+      </div>
+      <div class="top-combo">Most mentioned: <strong>THC</strong> (12 posts)</div>
+    </div>
+    <div class="symptom-card" data-symptom="Seizures">
+      <div class="symptom-name">Seizures <span class="card-tag">cannabinoid</span></div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">CBD + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">10</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD</span>
+          <div class="bar-track"><div class="bar-fill" style="width:70%;"></div></div>
+          <span class="bar-count">7</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:60%;"></div></div>
+          <span class="bar-count">6</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">THC + THCA</span>
+          <div class="bar-track"><div class="bar-fill" style="width:30%;"></div></div>
+          <span class="bar-count">3</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + Full Spectrum + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:10%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + CBN + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:10%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+      </div>
+      <div class="top-combo">Most mentioned: <strong>CBD + THC</strong> (10 posts)</div>
+    </div>
+    <div class="symptom-card" data-symptom="CHS">
+      <div class="symptom-name">CHS <span class="card-tag">cannabinoid</span></div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">12</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD</span>
+          <div class="bar-track"><div class="bar-fill" style="width:17%;"></div></div>
+          <span class="bar-count">2</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBD + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:17%;"></div></div>
+          <span class="bar-count">2</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">THC + THCA</span>
+          <div class="bar-track"><div class="bar-fill" style="width:17%;"></div></div>
+          <span class="bar-count">2</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">CBC + CBG + THC</span>
+          <div class="bar-track"><div class="bar-fill" style="width:8%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+      </div>
+      <div class="top-combo">Most mentioned: <strong>THC</strong> (12 posts)</div>
+    </div>
+    </div>
+    <p class="empty-note" id="cb-empty">No cannabinoid data for this symptom.</p>
+
+    <div class="section-head"><h2>By symptom — terpenes</h2><span class="count-badge">smaller sample</span></div>
+    <p class="section-sub">Terpenes are mentioned by name far less often than cannabinoids in casual posts, so these counts are smaller and more directional — worth reading as "what comes up" rather than a definitive ranking.</p>
+    <div class="cards-grid" id="terp-grid">
+    <div class="symptom-card" data-symptom="Anxiety">
+      <div class="symptom-name">Anxiety <span class="card-tag">terpene</span></div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">Caryophyllene + Limonene + Myrcene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">2</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Limonene + Myrcene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:50%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Caryophyllene + Humulene + Limonene + Myrcene + Nerolidol</span>
+          <div class="bar-track"><div class="bar-fill" style="width:50%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Caryophyllene + Myrcene + Pinene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:50%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Caryophyllene + Limonene + Linalool + Myrcene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:50%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Bisabolol + Caryophyllene + Myrcene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:50%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Caryophyllene + Myrcene + Terpinolene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:50%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Caryophyllene + Linalool</span>
+          <div class="bar-track"><div class="bar-fill" style="width:50%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+      </div>
+      <div class="top-combo">Most mentioned: <strong>Caryophyllene + Limonene + Myrcene</strong> (2 posts)</div>
+    </div>
+    <div class="symptom-card" data-symptom="ADHD">
+      <div class="symptom-name">ADHD <span class="card-tag">terpene</span></div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">Limonene + Myrcene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">2</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Caryophyllene + Limonene + Myrcene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">2</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Pinene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">2</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Caryophyllene + Myrcene + Pinene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:50%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Caryophyllene + Limonene + Linalool + Myrcene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:50%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Humulene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:50%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Caryophyllene + Myrcene + Terpinolene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:50%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Linalool</span>
+          <div class="bar-track"><div class="bar-fill" style="width:50%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+      </div>
+      <div class="top-combo">Most mentioned: <strong>Limonene + Myrcene</strong> (2 posts)</div>
+    </div>
+    <div class="symptom-card" data-symptom="Sleep">
+      <div class="symptom-name">Sleep <span class="card-tag">terpene</span></div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">Limonene + Myrcene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Caryophyllene + Humulene + Limonene + Myrcene + Nerolidol</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Caryophyllene + Myrcene + Pinene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Caryophyllene + Limonene + Linalool + Myrcene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Humulene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Caryophyllene + Myrcene + Terpinolene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Caryophyllene + Limonene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Caryophyllene + Geraniol + Limonene + Linalool + Myrcene + Pinene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+      </div>
+      <div class="top-combo">Most mentioned: <strong>Limonene + Myrcene</strong> (1 posts)</div>
+    </div>
+    <div class="symptom-card" data-symptom="Pain">
+      <div class="symptom-name">Pain <span class="card-tag">terpene</span></div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">Caryophyllene + Limonene + Myrcene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">2</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Linalool</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">2</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Caryophyllene + Humulene + Limonene + Myrcene + Nerolidol</span>
+          <div class="bar-track"><div class="bar-fill" style="width:50%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Caryophyllene + Myrcene + Pinene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:50%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Caryophyllene + Limonene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:50%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Myrcene + Pinene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:50%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Myrcene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:50%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Caryophyllene + Myrcene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:50%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+      </div>
+      <div class="top-combo">Most mentioned: <strong>Caryophyllene + Limonene + Myrcene</strong> (2 posts)</div>
+    </div>
+    <div class="symptom-card" data-symptom="Spasms">
+      <div class="symptom-name">Spasms <span class="card-tag">terpene</span></div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">Pinene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">2</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Caryophyllene + Limonene + Myrcene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:50%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Bisabolol + Caryophyllene + Myrcene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:50%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Caryophyllene + Myrcene + Terpinolene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:50%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Caryophyllene + Limonene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:50%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Limonene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:50%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Limonene + Linalool + Pinene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:50%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+      </div>
+      <div class="top-combo">Most mentioned: <strong>Pinene</strong> (2 posts)</div>
+    </div>
+    <div class="symptom-card" data-symptom="Inflammation">
+      <div class="symptom-name">Inflammation <span class="card-tag">terpene</span></div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">Caryophyllene + Limonene + Linalool + Myrcene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Caryophyllene + Limonene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Myrcene + Pinene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Pinene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Myrcene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Caryophyllene + Limonene + Myrcene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Caryophyllene + Myrcene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Linalool</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+      </div>
+      <div class="top-combo">Most mentioned: <strong>Caryophyllene + Limonene + Linalool + Myrcene</strong> (1 posts)</div>
+    </div>
+    <div class="symptom-card" data-symptom="Appetite">
+      <div class="symptom-name">Appetite <span class="card-tag">terpene</span></div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">Limonene + Myrcene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Caryophyllene + Limonene + Myrcene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Humulene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Linalool</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Limonene + Linalool + Pinene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+      </div>
+      <div class="top-combo">Most mentioned: <strong>Limonene + Myrcene</strong> (1 posts)</div>
+    </div>
+    <div class="symptom-card" data-symptom="Depression">
+      <div class="symptom-name">Depression <span class="card-tag">terpene</span></div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">Caryophyllene + Limonene + Myrcene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">2</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Bisabolol + Caryophyllene + Myrcene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:50%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+      </div>
+      <div class="top-combo">Most mentioned: <strong>Caryophyllene + Limonene + Myrcene</strong> (2 posts)</div>
+    </div>
+    <div class="symptom-card" data-symptom="Migraine">
+      <div class="symptom-name">Migraine <span class="card-tag">terpene</span></div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">Caryophyllene + Limonene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+      </div>
+      <div class="top-combo">Most mentioned: <strong>Caryophyllene + Limonene</strong> (1 posts)</div>
+    </div>
+    <div class="symptom-card" data-symptom="Cancer">
+      <div class="symptom-name">Cancer <span class="card-tag">terpene</span></div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">Caryophyllene + Limonene + Linalool + Myrcene + Pinene + Terpinolene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+      </div>
+      <div class="top-combo">Most mentioned: <strong>Caryophyllene + Limonene + Linalool + Myrcene + Pinene + Terpinolene</strong> (1 posts)</div>
+    </div>
+    <div class="symptom-card" data-symptom="Seizures">
+      <div class="symptom-name">Seizures <span class="card-tag">terpene</span></div>
+      <div class="cannabinoid-bars">
+        <div class="bar-row">
+          <span class="bar-label">Caryophyllene + Geraniol + Limonene + Linalool + Myrcene + Pinene</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+          <span class="bar-count">1</span>
+        </div>
+      </div>
+      <div class="top-combo">Most mentioned: <strong>Caryophyllene + Geraniol + Limonene + Linalool + Myrcene + Pinene</strong> (1 posts)</div>
+    </div>
+    </div>
+    <p class="empty-note" id="terp-empty">No terpene data for this symptom.</p>
+
+    <div class="section-head"><h2>Patient voices</h2><span class="count-badge">real excerpts, linked to source</span></div>
+    <p class="section-sub">Real excerpts from the dataset — trimmed, not edited in meaning. Click through to read the full original post on Reddit.</p>
+    <div class="voices-list" id="voices-grid">
+    <div class="voice-card" data-symptom="Sleep">
+      <div class="voice-text">"I like the idea of an entourage effect, but avoid using CBD at nighttime alongside THC because I’m afraid the CBD will make the THC less effective for insomnia (since it seems like that body high feeling, at least for me, is an important part of the equation). For THC I typically use sublingual drops, flower, or occasionally edibles, for CBD I use full spectrum sublingual drops"</div>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">THC</span>
+        <span class="tag tag-symptom">Sleep</span>
+        <span class="tag tag-positive">positive</span>
+        <span class="tag tag-source">r/MMJ</span>
+        <a class="tag tag-source" href="https://reddit.com/r/MMJ/comments/n1xzcg/" target="_blank" rel="noopener">View original ↗</a>
+      </div>
+    </div>
+    <div class="voice-card" data-symptom="Sleep">
+      <div class="voice-text">"I posted here just a few ago but I had another question. I think there is a genuine chance that weed could be making my sleep worse. I've noticed if I take a cbd capsule with 20 mg cbd to 10 mg thc, i sleep fantastic. But if I have much more thc at night I wake up feeling like I was hit by a bus, as if I never truly woke up from the sleep, etc. Any tips?"</div>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">THC</span>
+        <span class="tag tag-symptom">Sleep</span>
+        <span class="tag tag-negative">negative</span>
+        <span class="tag tag-source">r/MMJ</span>
+        <a class="tag tag-source" href="https://reddit.com/r/MMJ/comments/kuk9tl/" target="_blank" rel="noopener">View original ↗</a>
+      </div>
+    </div>
+    <div class="voice-card" data-symptom="Sleep">
+      <div class="voice-text">"Elevate: great price on these two and fresh and saucy sugar. Starkiller: Myrcene, Limonene, Nerolidol. Really nice for pain. A bit on the sleepy side. 1g Live sugar. Indica Superboof: Caryophyllene, Limonene, Myrcene. I have arthritis in my neck. This made my neck feel like a noodle. No pain for hours. also relaxing and laughy. 2g Cured Sugar. Hybrid Another Pick I made is also"</div>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">Myrcene</span>
+        <span class="tag tag-symptom">Sleep</span>
+        <span class="tag tag-positive">positive</span>
+        <span class="tag tag-source">r/MedicalMarijuana</span>
+        <a class="tag tag-source" href="https://reddit.com/r/MedicalMarijuana/comments/1eud92w/" target="_blank" rel="noopener">View original ↗</a>
+      </div>
+    </div>
+    <div class="voice-card" data-symptom="Anxiety">
+      <div class="voice-text">"I genuinely would freak out when smoking flower, especially sativa. Recently got a 2:1 ratio CBD:THC gummies and my anxiety is gone. In the past I would start to feel the come up and would freak myself out. Even if I wasn't anxious my brain would just tell myself "you're about to freak out you always do" and inevitably it would come. My brain tried to do this to me when I took "</div>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">THC</span>
+        <span class="tag tag-symptom">Anxiety</span>
+        <span class="tag tag-positive">positive</span>
+        <span class="tag tag-source">r/saplings</span>
+        <a class="tag tag-source" href="https://reddit.com/r/saplings/comments/1g1mwj5/" target="_blank" rel="noopener">View original ↗</a>
+      </div>
+    </div>
+    <div class="voice-card" data-symptom="Anxiety">
+      <div class="voice-text">"What I mean, is the anxious feeling that theres something wrong about using weed, especially thc, as a medicine. I often get this odd guilty feeling while I'm high, and it can prevent me from enjoying the effects. I have alot of social anxiety so I also tend to get super nervous in public that others will know that I'm high edit: no, smoking more weed is not the answer, it just"</div>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">THC</span>
+        <span class="tag tag-symptom">Anxiety</span>
+        <span class="tag tag-negative">negative</span>
+        <span class="tag tag-source">r/MMJ</span>
+        <a class="tag tag-source" href="https://reddit.com/r/MMJ/comments/l0dyng/" target="_blank" rel="noopener">View original ↗</a>
+      </div>
+    </div>
+    <div class="voice-card" data-symptom="Pain">
+      <div class="voice-text">"To exhausted to explain but in short, jump through hoops and all I've gotten is more pain from it and denials. My health has only gone for the worst since finally getting Healthcare... It should be improving, I should be getting somewhere. I shouldn't have to jump through hoops over and over again for basic freaking Healthcare. Especially ones I've already went through. This is"</div>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">THC</span>
+        <span class="tag tag-symptom">Pain</span>
+        <span class="tag tag-positive">positive</span>
+        <span class="tag tag-source">r/ChronicPain</span>
+        <a class="tag tag-source" href="https://reddit.com/r/ChronicPain/comments/1v3xwxm/" target="_blank" rel="noopener">View original ↗</a>
+      </div>
+    </div>
+    <div class="voice-card" data-symptom="Pain">
+      <div class="voice-text">"Wanted to share this after it was brought up in my previous post. I am by no means a doctor or drug test expert. I used THCA flower everyday for probably 3 years. All micro dosing in either a dynavap, covector v2, tempest v2, or my crafty+. I did quit THCA for 3 weeks before my physical for my new job, but I started using CBD flower after the first week of quitting THCA for pai"</div>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">THC</span>
+        <span class="tag tag-symptom">Pain</span>
+        <span class="tag tag-negative">negative</span>
+        <span class="tag tag-source">r/hempflowers</span>
+        <a class="tag tag-source" href="https://reddit.com/r/hempflowers/comments/1sccyt4/" target="_blank" rel="noopener">View original ↗</a>
+      </div>
+    </div>
+    <div class="voice-card" data-symptom="Spasms">
+      <div class="voice-text">"Hey everyone. I've had a huge influx in my symptoms that are resulting in a lot of anger and pain. Last night I highly medicated for some type of relief. However, during the day I try to limit my THC intake so it doesn't overly effect my work. I hit the vape before work and just took an edible. How do you balance symptoms and THC? I've been pretty do at it for the most part, bu"</div>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">THC</span>
+        <span class="tag tag-symptom">Spasms</span>
+        <span class="tag tag-positive">positive</span>
+        <span class="tag tag-source">r/MMJ</span>
+        <a class="tag tag-source" href="https://reddit.com/r/MMJ/comments/jon7q5/" target="_blank" rel="noopener">View original ↗</a>
+      </div>
+    </div>
+    <div class="voice-card" data-symptom="Spasms">
+      <div class="voice-text">"I did an oven decarb. Did 15 minutes at 280, 15 minutes at 260 and then 10 minutes at 240. 27g. I stopped when the "champagne bubbles" stopped but it seems new bubbles formed overnight. Total weight went down by 1.52 grams. Assuming around 60% THCa, that would be 2 grams off of weight. I was planning on making brownies. Do I need to decarb longer? If the recipe for brownies cal"</div>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">THC</span>
+        <span class="tag tag-symptom">Spasms</span>
+        <span class="tag tag-negative">negative</span>
+        <span class="tag tag-source">r/CannabisExtracts</span>
+        <a class="tag tag-source" href="https://reddit.com/r/CannabisExtracts/comments/1kvv0nh/" target="_blank" rel="noopener">View original ↗</a>
+      </div>
+    </div>
+    <div class="voice-card" data-symptom="ADHD">
+      <div class="voice-text">"Just a rant. Sometimes I think the community gets lost in the details. Everyone debates a few percentage points of THCA like it’s a life changing difference but most people couldn’t tell them apart in a blind test. I was looking through product feedback on wkf and noticed most users just call it good or off. That’s probably the real measure. Past a certain point, precision stop"</div>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">THC</span>
+        <span class="tag tag-symptom">ADHD</span>
+        <span class="tag tag-positive">positive</span>
+        <span class="tag tag-source">r/marijuana</span>
+        <a class="tag tag-source" href="https://reddit.com/r/marijuana/comments/1ol95xg/" target="_blank" rel="noopener">View original ↗</a>
+      </div>
+    </div>
+    <div class="voice-card" data-symptom="ADHD">
+      <div class="voice-text">"Does anyone here have experience with self-medicating anxiety, depression and CPTSD by smoking medicinal cannabis? I have an opportunity to try an indicate strain with 16% CBD and 0.7% THC (THC makes me very anxious so not sure if that’s low enough to not cause me anxiety). Should I go for it? I already take lamictal (75g) daily and clonex up to twice a week so as not to get ad"</div>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">THC</span>
+        <span class="tag tag-symptom">ADHD</span>
+        <span class="tag tag-negative">negative</span>
+        <span class="tag tag-source">r/MMJ</span>
+        <a class="tag tag-source" href="https://reddit.com/r/MMJ/comments/rv1p54/" target="_blank" rel="noopener">View original ↗</a>
+      </div>
+    </div>
+    <div class="voice-card" data-symptom="Depression">
+      <div class="voice-text">"Hi and thanks for reading. No one has said anything to me at work but I suspect my functioning is being impaired. I have been prescribed medical THC for pain control. When I discussed it with my Doctor I was told it was a question of weighing up advantages and disadvantages but it's not that simple. It is the one medicine that has helped me but I am concerned that my performanc"</div>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">THC</span>
+        <span class="tag tag-symptom">Depression</span>
+        <span class="tag tag-positive">positive</span>
+        <span class="tag tag-source">r/thc</span>
+        <a class="tag tag-source" href="https://reddit.com/r/thc/comments/1furij6/" target="_blank" rel="noopener">View original ↗</a>
+      </div>
+    </div>
+    <div class="voice-card" data-symptom="Depression">
+      <div class="voice-text">"Just wanted to say I quit weed today and started smoking CBD flower instead. I really wasn't expecting anything from the CBD flower because in the past I tried vaping CBD with the strongest possible concentrate available, and it did absolutely nothing for me. However, I have been pleasantly surprised with the flower. For today it has greatly reduced my anxiety, depression and t"</div>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">THC</span>
+        <span class="tag tag-symptom">Depression</span>
+        <span class="tag tag-negative">negative</span>
+        <span class="tag tag-source">r/CBD</span>
+        <a class="tag tag-source" href="https://reddit.com/r/CBD/comments/1rst329/" target="_blank" rel="noopener">View original ↗</a>
+      </div>
+    </div>
+    <div class="voice-card" data-symptom="Appetite">
+      <div class="voice-text">"Hi r/MMJ community, my grandmother has breast cancer that has metastasized into her brain as a tumor. She's undergone chemo once as well as radiation therapy to remove as much of the cancer cells as possible. She's in a lot of pain when outside of the hospital and I've heard medical marijuana can help treat pain and nausea for cancer patients. I've sourced a doctor who can pres"</div>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">THC</span>
+        <span class="tag tag-symptom">Appetite</span>
+        <span class="tag tag-positive">positive</span>
+        <span class="tag tag-source">r/MMJ</span>
+        <a class="tag tag-source" href="https://reddit.com/r/MMJ/comments/lbxk0s/" target="_blank" rel="noopener">View original ↗</a>
+      </div>
+    </div>
+    <div class="voice-card" data-symptom="Appetite">
+      <div class="voice-text">"So far it's a bitch and I'm not really sure why as I'm still eating the thc. I use it a lot for anxiety and have been an everyday smoker for like 15 years. My partner had a frank conversation with me about how she "wants to keep me around". My asthma has been bad and I've gotten bronchitis multiple times a year for the past few years. I love her so much and would do anything fo"</div>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">THC</span>
+        <span class="tag tag-symptom">Appetite</span>
+        <span class="tag tag-negative">negative</span>
+        <span class="tag tag-source">r/thc</span>
+        <a class="tag tag-source" href="https://reddit.com/r/thc/comments/1au92uk/" target="_blank" rel="noopener">View original ↗</a>
+      </div>
+    </div>
+    <div class="voice-card" data-symptom="Migraine">
+      <div class="voice-text">"I have chronic daily migraines and if I forget to take my tincture (10/1 CBD/THC) the head pain starts up by the afternoon. The pain continues to build for the rest of the day. When I take the tincture 3 times per day I just have the brain fog and blurry vision that comes on late afternoon/evening but no or little pain. Does anyone else find cannabis works as a preventative?"</div>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">THC</span>
+        <span class="tag tag-symptom">Migraine</span>
+        <span class="tag tag-positive">positive</span>
+        <span class="tag tag-source">r/MedicalMarijuana</span>
+        <a class="tag tag-source" href="https://reddit.com/r/MedicalMarijuana/comments/zp9owm/" target="_blank" rel="noopener">View original ↗</a>
+      </div>
+    </div>
+    <div class="voice-card" data-symptom="Migraine">
+      <div class="voice-text">"I’ve been vaping sativa for five years, pretty consistently and came to the realization that it probably wasn’t good for me so quit. Its been 3 weeks. I’ve had horrible withdrawal symptoms- cant sleep, sweats, anxiety, ,crying, headache, lethargy, spaciness but the worst part is life feels black and white instead of colorful the way it was when I could be high. I’m wondering if"</div>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">THC</span>
+        <span class="tag tag-symptom">Migraine</span>
+        <span class="tag tag-negative">negative</span>
+        <span class="tag tag-source">r/thc</span>
+        <a class="tag tag-source" href="https://reddit.com/r/thc/comments/1ba26vc/" target="_blank" rel="noopener">View original ↗</a>
+      </div>
+    </div>
+    <div class="voice-card" data-symptom="Nausea">
+      <div class="voice-text">"I just had to share the best little prescription for tummy trouble. Heights mints are an intense but sweet mint with 2.5 mg thc per little lozenge, and it is the cure for even really intractable medicine-induced nausea. It also helps with acidy and hot stomach feelings. One or two at most, slowly dissolved in the mouth are just so effective for me, and not enough to get you so "</div>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">THC</span>
+        <span class="tag tag-symptom">Nausea</span>
+        <span class="tag tag-positive">positive</span>
+        <span class="tag tag-source">r/MMJ</span>
+        <a class="tag tag-source" href="https://reddit.com/r/MMJ/comments/lnw5ep/" target="_blank" rel="noopener">View original ↗</a>
+      </div>
+    </div>
+    <div class="voice-card" data-symptom="Nausea">
+      <div class="voice-text">"With high THC strains, paranoia hits me incredibly hard. It’s been years since I’ve even attempted using anything with THC. Side effects include racing heart, disorientation, sense of doom, nausea, vomiting, etc. However, worsening anxiety and stress are having me look for a natural remedy. Has anyone with a similar experience tried using a 2:1 (cbd:thc) product with any succes"</div>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">THC</span>
+        <span class="tag tag-symptom">Nausea</span>
+        <span class="tag tag-negative">negative</span>
+        <span class="tag tag-source">r/MMJ</span>
+        <a class="tag tag-source" href="https://reddit.com/r/MMJ/comments/myhnk7/" target="_blank" rel="noopener">View original ↗</a>
+      </div>
+    </div>
+    <div class="voice-card" data-symptom="Inflammation">
+      <div class="voice-text">"Hey all. This is something I’ve kinda mentally struggled with for a while. I benefit most from heavy CBD strains (3:1 and 2:1 ratios). It helps to greatly reduce my inflammation and also calms my anxiety/helps with focus. I’ve always just used before and after work, because for some reason I feel guilty and like a bad person when I think about using it while working. However, I"</div>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">CBD</span>
+        <span class="tag tag-symptom">Inflammation</span>
+        <span class="tag tag-positive">positive</span>
+        <span class="tag tag-source">r/MMJ</span>
+        <a class="tag tag-source" href="https://reddit.com/r/MMJ/comments/kn6mwy/" target="_blank" rel="noopener">View original ↗</a>
+      </div>
+    </div>
+    <div class="voice-card" data-symptom="Inflammation">
+      <div class="voice-text">"has anyone had any positive experiences regarding cbd and acne ? my face has always been very prone to inflammation and hormonal acne. recently i bought a cbd tincture from lazarus naturals and have taken 50mg every night before bed (for insomnia and anxiety). i’ve noticed that my skin has become quite calm with less redness and i’m wondering if the cbd is contributing to it? i"</div>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">CBD</span>
+        <span class="tag tag-symptom">Inflammation</span>
+        <span class="tag tag-negative">negative</span>
+        <span class="tag tag-source">r/CBD</span>
+        <a class="tag tag-source" href="https://reddit.com/r/CBD/comments/1ru89s9/" target="_blank" rel="noopener">View original ↗</a>
+      </div>
+    </div>
+    <div class="voice-card" data-symptom="Opioid_Substitution">
+      <div class="voice-text">"I just got my first low THC oil today as well as my card. It's 1200mg THC and 1200mg CBD 1:1 ratio. One drop = 2mg THC and CBD. I've never done any kind of drugs, including marijuana. I don't drink alcohol. I don't even take the opioids often that my doctor will prescribe me for pain. I'm 5'4" and 130lb. It's for extreme nausea and essential tremors. Any thoughts on what to exp"</div>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">THC</span>
+        <span class="tag tag-symptom">Opioid Substitution</span>
+        <span class="tag tag-positive">positive</span>
+        <span class="tag tag-source">r/MedicalMarijuana</span>
+        <a class="tag tag-source" href="https://reddit.com/r/MedicalMarijuana/comments/16sb2m8/" target="_blank" rel="noopener">View original ↗</a>
+      </div>
+    </div>
+    <div class="voice-card" data-symptom="Cancer">
+      <div class="voice-text">"Hello. I’m undergoing chemotherapy for cancer and find marijuana works better to treat my symptoms than all the various prescriptions I have. I’ve been using mostly gummies bought at a dispensary but I want to find something I can use during the day at work. If I get something that’s really low THC but high CBD will it still help my nausea? There’s so many different options in "</div>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">CBD</span>
+        <span class="tag tag-symptom">Cancer</span>
+        <span class="tag tag-positive">positive</span>
+        <span class="tag tag-source">r/MedicalMarijuana</span>
+        <a class="tag tag-source" href="https://reddit.com/r/MedicalMarijuana/comments/1geee0v/" target="_blank" rel="noopener">View original ↗</a>
+      </div>
+    </div>
+    <div class="voice-card" data-symptom="Cancer">
+      <div class="voice-text">"I was asked by my daughter if I would talk to her friend who has cancer about using MMJ for the pain etc. I use due to chronic pain so my use may be different then hers. She is nearing the end of her chapter. She doesn’t want to take oxy cause for her it worse on it than off it. I use a lot of 1-1 the CBD help’s neuropathy. She will be new to this and it is recommended by her d"</div>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">CBD</span>
+        <span class="tag tag-symptom">Cancer</span>
+        <span class="tag tag-negative">negative</span>
+        <span class="tag tag-source">r/MedicalMarijuana</span>
+        <a class="tag tag-source" href="https://reddit.com/r/MedicalMarijuana/comments/1trhw4a/" target="_blank" rel="noopener">View original ↗</a>
+      </div>
+    </div>
+    <div class="voice-card" data-symptom="Seizures">
+      <div class="voice-text">"I see ROYAL CBD is $130~ for 1000mg 10ml bottle Is there any other companies that make 1000mg for cheaper? I see hemp oil on amazing for $30 same 1000mg..what's the difference. This is for my dog who has idiopathic epilepsy and has very bad seizures and is on 5 seizure medicines and I've given him CBD oil orally and it helps but I cannot find 1000mg+ oil that is cost effective "</div>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">CBD</span>
+        <span class="tag tag-symptom">Seizures</span>
+        <span class="tag tag-positive">positive</span>
+        <span class="tag tag-source">r/CBDOil</span>
+        <a class="tag tag-source" href="https://reddit.com/r/CBDOil/comments/fkyysb/" target="_blank" rel="noopener">View original ↗</a>
+      </div>
+    </div>
+    <div class="voice-card" data-symptom="Seizures">
+      <div class="voice-text">"Has anyone used cbd as a mood stabilizer successfully? More specifically, in place of drugs like lamictal, which is an anti seizure medication. I know it works well for anxiety and seizures, so I was wondering if it is possible to switch to cbd for the same benefits. I have terrible side effects from lamictal involving memory issues."</div>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">CBD</span>
+        <span class="tag tag-symptom">Seizures</span>
+        <span class="tag tag-negative">negative</span>
+        <span class="tag tag-source">r/CBDOil</span>
+        <a class="tag tag-source" href="https://reddit.com/r/CBDOil/comments/cfh2zy/" target="_blank" rel="noopener">View original ↗</a>
+      </div>
+    </div>
+    <div class="voice-card" data-symptom="CHS">
+      <div class="voice-text">"Situation:1. I use cannabis nightly for sleep;I have RLS, restless leg syndrome, and it helps me sleep. 2. I have been nauseated during the day. Question: Do you, who use daily, experience daytime nausea? Yes daytime nausea with nightly THC use seems counterintuitive as THC is used to treat nausea but I have heard anecdotal stories supporting daytime nausea correlating with dai"</div>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">THC</span>
+        <span class="tag tag-symptom">CHS</span>
+        <span class="tag tag-positive">positive</span>
+        <span class="tag tag-source">r/MMJ</span>
+        <a class="tag tag-source" href="https://reddit.com/r/MMJ/comments/qzm8rb/" target="_blank" rel="noopener">View original ↗</a>
+      </div>
+    </div>
+    <div class="voice-card" data-symptom="CHS">
+      <div class="voice-text">"ive been smoking cannabis just about every day since i was 15 and im 25 now. well ive got GERD diagnosed for the past year, also having acid reflux as a child. on top of IBS. and ive noticed for quite some time, almost every day, AT LEAST the first joint of the day and sometimes all of them, triggers me to gag, dry heave, and usually vomit acid. i will probably never stop consu"</div>
+      <div class="voice-meta">
+        <span class="tag tag-cannabinoid">THC</span>
+        <span class="tag tag-symptom">CHS</span>
+        <span class="tag tag-negative">negative</span>
+        <span class="tag tag-source">r/MMJ</span>
+        <a class="tag tag-source" href="https://reddit.com/r/MMJ/comments/10gpxpm/" target="_blank" rel="noopener">View original ↗</a>
+      </div>
+    </div>
+    </div>
+    <p class="empty-note" id="voices-empty">No patient-voice quotes for this symptom.</p>
+
+    <div class="methodology">
+      <h3>How this was built</h3>
+      <p>Posts were collected from public subreddits using the Arctic Shift archive API, then scanned with keyword matching to detect mentions of cannabinoids, terpenes, symptoms, consumption methods, and outcome language (e.g. "helped", "didn't work", "side effects"). This is automated keyword detection, not clinical review — it reflects what people wrote, not verified medical outcomes, and keyword matching can misfire (sarcasm, negation, or context aren't fully understood).</p>
+      <p>This dashboard is a summary of public opinion and self-reported experience, not medical advice or a clinical study. Nothing here should be used to make treatment decisions — talk to a doctor about that.</p>
+      <p><a href="#">View the raw dataset (CSV) →</a> &nbsp;·&nbsp; Data current as of 2016-08-14 to 2026-08-11</p>
+    </div>
+  </main>
+</div>
+<footer>Built from public Reddit data · Not medical advice · Generated August 11, 2026</footer>
+<script>
+(function() {
+  var buttons = document.querySelectorAll('.filter-btn');
+  var filterables = document.querySelectorAll('[data-symptom]');
+  var emptyNotes = {
+    'cb-grid': document.getElementById('cb-empty'),
+    'terp-grid': document.getElementById('terp-empty'),
+    'voices-grid': document.getElementById('voices-empty')
+  };
+
+  function applyFilter(symptom) {
+    filterables.forEach(function(el) {
+      var match = symptom === 'all' || el.getAttribute('data-symptom') === symptom;
+      el.style.display = match ? '' : 'none';
+    });
+    Object.keys(emptyNotes).forEach(function(gridId) {
+      var grid = document.getElementById(gridId);
+      if (!grid) return;
+      var visible = Array.prototype.slice.call(grid.children).some(function(c) {
+        return c.style.display !== 'none';
+      });
+      emptyNotes[gridId].style.display = visible ? 'none' : 'block';
+    });
+  }
+
+  buttons.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      buttons.forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      applyFilter(btn.getAttribute('data-symptom'));
+    });
+  });
+})();
+</script>
+</body>
+</html>
