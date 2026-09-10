@@ -3869,26 +3869,12 @@
 (function() {
   var form = document.getElementById('contribute-form');
   var status = document.getElementById('cf-status');
-  var endpoint = null;
+  var endpoint = 'https://formspree.io/f/mvkolqng';
 
   form.addEventListener('submit', function(e) {
     e.preventDefault();
     var data = new FormData(form);
 
-    if (!endpoint) {
-      // No Formspree endpoint configured — honest fallback, not a fake success message.
-      var subject = encodeURIComponent('Cannabis dashboard submission: ' + data.get('substance') + ' for ' + data.get('symptom'));
-      var body = encodeURIComponent(
-        'Substance: ' + data.get('substance') + '\n' +
-        'Symptom: ' + data.get('symptom') + '\n' +
-        'Outcome: ' + data.get('outcome') + '\n\n' +
-        data.get('experience')
-      );
-      status.textContent = "Submissions aren't wired up to auto-collect yet — opening your email client instead.";
-      status.className = 'contribute-status success';
-      window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
-      return;
-    }
 
     status.textContent = 'Submitting...';
     status.className = 'contribute-status success';
